@@ -1,0 +1,54 @@
+- hosts: all
+ 
+  vars:
+    - exclude_db:
+      - "Database"
+      - "information_schema"
+      - "performance_schema"
+      - "mysql"
+      - "sys"
+      - "postgres"
+      - "myapp_test"
+      - "template0"
+      - "template1"
+      - "myapp_development"
+
+  tasks:
+
+    - name: create backup directory
+      file:
+        path: /root/my_bkp
+        state: directory
+
+    - name: backup /etc
+      archive:
+        path: /etc
+        dest: /root/my_bkp/etc.tgz
+
+    - name: backup /var
+      archive:
+        path: /var
+        dest: /root/my_bkp/var.tgz
+
+    - name: Install the package python_mysqldb
+      apt:
+        name: python-mysqldb
+        state: present
+
+    - name: get mysql db names
+      shell: 'mysql -e "show databases;" '
+      register: dblist
+
+    - name: backup mysql databases
+      mysql_db:
+        state: dump
+        name: "{{ item }}"
+        target: "/root/my_bkp/{{ item }}.sql"
+      with_items: "{{ dblist.stdout_lines | difference(exclude_db) }}"
+
+    - name: copy remote backup directory to local machine 
+      synchronize:
+        src: /root/my_bkp
+        dest: .
+        mode: pull
+
