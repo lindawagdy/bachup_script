@@ -7,11 +7,6 @@
       - "performance_schema"
       - "mysql"
       - "sys"
-      - "postgres"
-      - "myapp_test"
-      - "template0"
-      - "template1"
-      - "myapp_development"
 
   tasks:
 
