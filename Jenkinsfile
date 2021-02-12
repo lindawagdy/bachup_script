@@ -10,9 +10,12 @@ pipeline {
     stage('Bees Bees') {
       steps {
         echo 'Buzz, Bees, Buzz!'
-        archiveArtifacts(artifacts: 'firstartifacts', fingerprint: true)
+        sh 'echo "i\'m ${var1}"'
       }
     }
 
+  }
+  environment {
+    var1 = 'linda'
   }
 }
